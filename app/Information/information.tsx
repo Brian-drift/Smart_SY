@@ -1,7 +1,7 @@
 import React from 'react';
-import {Text, View, StyleSheet, TouchableOpacity} from "react-native";
+import {Text, StyleSheet, TouchableOpacity} from "react-native";
 
-const InfoItem = ( { item }: { item: any }  )=> {
+const Information = ({ item }: { item: any }  )=> {
 
     return (
         <TouchableOpacity style={[styles.container]}
@@ -46,4 +46,4 @@ const styles = StyleSheet.create({
 }
 })
 
-export default InfoItem;
+export default Information;

@@ -9,13 +9,10 @@ import {
     Text,
     TouchableOpacity, TextInput, ImageBackground // Ajout de TouchableOpacity pour le bouton Skip
 } from "react-native";
-import slide from "@/app/onboardings/slides";
-import OnboardingItems from "@/app/onboardings/onboardingItems";
-import Paginator from "@/app/onboardings/paginator";
-import MotiText from "@/app/moti/motiText";
-import MotiAnim from "@/app/moti/motiAnim";
-
-
+import slide from "@/app/DebutOnboading/slides";
+import OnboardingItems from "@/app/DebutOnboading/onboardingItems";
+import Paginator from "@/app/DebutOnboading/paginator";
+import Authentification from "@/app/Authentification/authentification";
 
 export default function Onboarding(){
     const scrollX = useRef(new Animated.Value(0)).current;
@@ -60,7 +57,7 @@ export default function Onboarding(){
     // Pour l'exemple, affichons un texte simple
     if (showHomePage) {
         return (
-                <MotiAnim/>
+                <Authentification/>
                 /*afin de revoire l'onboarding si je veux*/
                 /*<Button title="RéVOIR LE ONBOARDING" onPress={async () => {
                     await AsyncStorage.removeItem('@viewedOnboarding');

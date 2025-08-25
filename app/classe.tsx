@@ -2,8 +2,8 @@ import React, {useState, useCallback } from 'react';
 import {View, StyleSheet, TouchableOpacity, Text, FlatList, ActivityIndicator} from "react-native";
 import { Dimensions } from "react-native";
 import {MotiView} from "moti";
-import infoSlide from "@/app/le savais-tu/infoSlide";
-import InfoItem from "@/app/le savais-tu/infoItem";
+import infoSlide from "@/app/Information/infoSlide";
+import Information from "@/app/Information/information";
 import LottieView from "lottie-react-native";
 import {useNavigation,useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +13,7 @@ function Classe(props: any ) {
 
     const {width, height} = Dimensions.get("window");
     const circleSize = 25;
-    const [isHeight, setHeight] = useState( false )// gere la longeur du composant moti
+    const [isHeight, setHeight] = useState( false )// gere la longeur du composant Authentification
     const handleHeight =  () => {
         setHeight(!isHeight);
     }
@@ -61,9 +61,10 @@ function Classe(props: any ) {
         return (
             <View style={styles.centered}>
                 <ActivityIndicator size="large" color="#0000ff" />
-                <Text>Chargement des données...</Text>
+                <Text style={{ fontSize : 18, color : '#0077FFFF',}}> Bonjours, chargement des données</Text>
             </View>
         );
+
     }
 
     return (
@@ -80,11 +81,7 @@ function Classe(props: any ) {
                      borderRadius: 5,
                      zIndex: 10, // Assure que le bouton est au-dessus d'autres éléments
                         }}>
-                <Text  style={{
-                    fontSize : 18,
-                    fontWeight : 'bold',
-                    fontFamily: 'Colona MT',
-                    color : isHeight ? 'rgba(0,119,255,0)' :'#1c9bd5',}}>{nom}</Text>
+                <Text>Profils</Text>
             </TouchableOpacity>
 
             =======================================   * MOTI RETRACTABLE *   ===============================================
@@ -97,9 +94,9 @@ function Classe(props: any ) {
                            backgroundColor : 'rgba(222,222,222,0.17)',
                        }}
                        animate = {{
-                           top : 100,
-                           width : width - 20,
-                           height : isHeight ?  height - 140 : 200,
+                           top : '10%',
+                           width : isHeight ? '100%' : '95%',
+                           height : isHeight ?  '88%'  : '21%',
                            borderRadius : circleSize,
                            backgroundColor : isHeight ? 'rgba(10,10,10,0.44)' : 'rgba(180,180,180,0.38)',
                            borderTopWidth : 3,
@@ -109,7 +106,7 @@ function Classe(props: any ) {
                        }}
                        transition={{
                            duration : 1000,
-                           type: "timing"
+                           type: "spring"
                        }}>
                 <Text
                     style = {{
@@ -127,7 +124,7 @@ function Classe(props: any ) {
                         color : isHeight ? 'rgba(0,119,255,0)' :'#0077FFFF',}}>{nom}</Text></Text>
                 {<FlatList data={infoSlide}
                         // pagingEnabled = {true}
-                        renderItem={({item}) => <InfoItem item={item}/>}
+                        renderItem={({item}) => <Information item={item}/>}
                         style = {styles.flalisStyle}
                         keyExtractor={(item) => item.id}
                         scrollEventThrottle = {16}

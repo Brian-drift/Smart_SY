@@ -1,7 +1,8 @@
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import Onboarding from "@/app/onboardings/onboarding";
+import Onboarding from "@/app/DebutOnboading/onboarding";
 import Classe from "@/app/classe";
-import ecranProflls from "@/app/MOI/ecranProflls";
+import ecranProflls from "@/app/Profils/ecranProflls";
+import EditorScreen from "@/app/Editeurs";
 
 
 const Stack = createNativeStackNavigator();
@@ -11,6 +12,7 @@ export default function Index() {
             <Stack.Screen name={"Onboarding"} component={Onboarding}/>
             <Stack.Screen name={"Classe"} component={Classe}/>
             <Stack.Screen name={"ecranProfile"} component={ecranProflls} />
+            <Stack.Screen name={"EditorScreen"} component={EditorScreen} />
         </Stack.Navigator>
     );
 }
