@@ -2,11 +2,10 @@ import React, {useState, useCallback } from 'react';
 import {View, StyleSheet, TouchableOpacity, Text, FlatList, ActivityIndicator} from "react-native";
 import { Dimensions } from "react-native";
 import {MotiView} from "moti";
-import infoSlide from "@/app/Information/infoSlide";
-import Information from "@/app/Information/information";
 import LottieView from "lottie-react-native";
 import {useNavigation,useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FactComponent from "@/app/Information/information";
 
 
 function Classe(props: any ) {
@@ -63,9 +62,7 @@ function Classe(props: any ) {
                 <ActivityIndicator size="large" color="#0000ff" />
                 <Text style={{ fontSize : 18, color : '#0077FFFF',}}> Bonjours, chargement des données</Text>
             </View>
-        );
-
-    }
+        );    }
 
     return (
         <View style={[styles.container, { backgroundColor : isHeight ? 'rgba(10,10,10,0.44)' : 'transparent',}]}>
@@ -87,9 +84,9 @@ function Classe(props: any ) {
             =======================================   * MOTI RETRACTABLE *   ===============================================
             <MotiView  style={[styles.motiView,]}
                        from={{
-                           top : 75,
-                           width : circleSize,
-                           height : circleSize,
+                           top : "10%",
+                           width : "80%",
+                           height : "21%",
                            borderRadius : circleSize / 2,
                            backgroundColor : 'rgba(222,222,222,0.17)',
                        }}
@@ -106,7 +103,7 @@ function Classe(props: any ) {
                        }}
                        transition={{
                            duration : 1000,
-                           type: "spring"
+                           type: 'timing'
                        }}>
                 <Text
                     style = {{
@@ -122,9 +119,9 @@ function Classe(props: any ) {
                         fontWeight : 'bold',
                         fontFamily: 'Rockwell',
                         color : isHeight ? 'rgba(0,119,255,0)' :'#0077FFFF',}}>{nom}</Text></Text>
-                {<FlatList data={infoSlide}
-                        // pagingEnabled = {true}
-                        renderItem={({item}) => <Information item={item}/>}
+                {<FlatList
+                        data={}
+                        renderItem={({item}) => <FactComponent item={item}/>}
                         style = {styles.flalisStyle}
                         keyExtractor={(item) => item.id}
                         scrollEventThrottle = {16}
@@ -150,7 +147,9 @@ function Classe(props: any ) {
             <View style={styles.vuePrinClasses}>
                 <View style={styles.ensembleClasse}>
                     <View style={styles.classeMin}>
-                        <TouchableOpacity>
+                        {/* 1 er */}
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("EcransDesPremieres")}>
                             <MotiView
                                 style={{
                                     overflow : 'hidden',
@@ -203,7 +202,10 @@ function Classe(props: any ) {
 
                             </MotiView>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        {/* 2 eme */}
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("EcransDesDeuxiemes")}>
+                        >
                             <MotiView
                                 style={{
                                     overflow : 'hidden',
@@ -254,7 +256,9 @@ function Classe(props: any ) {
                             </MotiView>
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity>
+                    {/* 3 eme */}
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate("EcransDesTroisiemes")}>
                         <MotiView
                             style={{
                                 overflow : 'hidden',
@@ -303,13 +307,15 @@ function Classe(props: any ) {
                         </MotiView>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity>
+                {/* 4 eme */}
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("EcransDesQuatriemes")}>
                     <MotiView
                         style={{
                             flexDirection: "row", // STYLES des composant à l'interieur de la vue
                         }}
                         from = {{
-                            width : 50,
+                            width : 25,
                             height : 25,
                             backgroundColor : "#1a9cd7",
                             borderRadius : 12.5,
@@ -323,7 +329,7 @@ function Classe(props: any ) {
                             borderRadius : 4,
                         }}
                         transition = {{
-                            duration : 2500,
+                            duration : 1250,
                            type: "timing"
                         }}>
                         <Text style = {{

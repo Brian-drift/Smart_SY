@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // N'oublie pas d'importer useState !
 import {Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View} from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Classe from "@/app/classe";
+import Classe from "@/app/(TABS) CLASSES/Reception/classe";
 import LottieView from "lottie-react-native";
 // soit l'ecran qui gére la connexion au SERVEUR.
 
