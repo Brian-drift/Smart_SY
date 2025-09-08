@@ -1,42 +1,49 @@
-import React from 'react';
-import {View, StyleSheet, Text, FlatList} from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, View, StyleSheet } from "react-native";
+import SyllabusCard from "@/app/composants/syllabus_card";
 
-function EcransDesTroisiemes(props:any) {
+export default function EcransDesPremieres() {
+    const [dogs, setDogs] = useState<string[]>([]); // tableau d'images
+    const [refreshing, setRefreshing] = useState(false);
+
+    const fetchDogs = async () => {
+        try {
+            setRefreshing(true);
+            // API qui renvoie plusieurs images aléatoires
+            const res = await fetch("https://dog.ceo/api/breeds/image/random/2000");
+            const json = await res.json();
+            setDogs(json.message); // message est un tableau d’URLs
+        } catch (error) {
+            console.error("Erreur API:", error);
+        } finally {
+            setRefreshing(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchDogs();
+    }, []);
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Troisième</Text>
-            {/*---------------------------------------------------------------------------------------------------------------------------------------------*/}
-            {/* -- lorsque fred aura fini le backEnd c'est ici que les différents syllabus pourons s'afficher -- */}
-            {/* -- vous aurait remarqué que la conception de cette flatlist est similaire à celui des professeures -- */}
-            {/* -- c'est tout à fait volontaire de m'a part, car l'écrans des classes éditeurs sont s'afficherons comme les écrans des classes recéptionistes -- */}
-            {/*---------------------------------------------------------------------------------------------------------------------------------------------*/}
-            {/*<FlatList
+            <FlatList
                 numColumns={2}
-                data={syllabusList}
-                renderItem={}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.flatListContent}
-            />*/}
+                data={dogs}
+                renderItem={({ item, index }) => (
+                    <SyllabusCard id={index.toString()} imageUrl={item} />
+                )}
+                keyExtractor={(_, index) => index.toString()}
+                contentContainerStyle={{ padding: 10 }}
+                refreshing={refreshing}
+                onRefresh={fetchDogs}
+            />
         </View>
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: "#f2f2f2",
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginTop: 25,
-        marginBottom: 20,
-    },
-    flatListContent: {
-        padding: 0,
-        width: '100%',
-    },
-})
-export default EcransDesTroisiemes;
+});

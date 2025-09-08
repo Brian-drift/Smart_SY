@@ -1,17 +1,17 @@
 import React, {useState, useCallback } from 'react';
-import {View, StyleSheet, TouchableOpacity, Text, FlatList, ActivityIndicator} from "react-native";
-import { Dimensions } from "react-native";
+import {View, StyleSheet, TouchableOpacity, Text, ActivityIndicator} from "react-native";
 import {MotiView} from "moti";
 import LottieView from "lottie-react-native";
 import {useNavigation,useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import FactComponent from "@/app/Information/information";
+import FactComponent from "@/app/Information/factComponent";
+import DateAffiche from "@/app/composants/dateAffiche";
+import JoursAffiche from "@/app/composants/jourAffiche";
+import MoisAffiche from "@/app/composants/moisAffiche";
 
 
 function Classe(props: any ) {
 
-    const {width, height} = Dimensions.get("window");
-    const circleSize = 25;
     const [isHeight, setHeight] = useState( false )// gere la longeur du composant Authentification
     const handleHeight =  () => {
         setHeight(!isHeight);
@@ -20,7 +20,6 @@ function Classe(props: any ) {
     const navigation = useNavigation();
 
     const [nom, setNom] = useState('');
-    const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(true); // Ajout de l'état de chargement
 
     const loadProfile = async () => {
@@ -29,7 +28,6 @@ function Classe(props: any ) {
             if (jsonValue != null) {
                 const donnees = JSON.parse(jsonValue);
                 setNom(donnees.nom);
-                setEmail(donnees.email);
             }
         } catch (e) {
             console.error('Erreur lors du chargement :', e);
@@ -84,22 +82,19 @@ function Classe(props: any ) {
             =======================================   * MOTI RETRACTABLE *   ===============================================
             <MotiView  style={[styles.motiView,]}
                        from={{
-                           top : "10%",
-                           width : "80%",
-                           height : "21%",
-                           borderRadius : circleSize / 2,
+                           top : "0%",
+                           width : "100%",
+                           height : "1%",
                            backgroundColor : 'rgba(222,222,222,0.17)',
                        }}
                        animate = {{
-                           top : '10%',
-                           width : isHeight ? '100%' : '95%',
-                           height : isHeight ?  '88%'  : '21%',
-                           borderRadius : circleSize,
-                           backgroundColor : isHeight ? 'rgba(10,10,10,0.44)' : 'rgba(180,180,180,0.38)',
-                           borderTopWidth : 3,
-                           borderLeftWidth : 2,
-                           borderRightWidth : 2,
-                           borderColor : 'rgba(107,107,107,0.99)',
+                           top : '0%',
+                           width : isHeight ? '100%' : '100%',
+                           height : isHeight ?  '95%'  : '40%',
+                           borderBottomRightRadius : 45,
+                           borderBottomLeftRadius : 50,
+                           backgroundColor : isHeight ? 'rgba(10,10,10,0.44)' : 'rgba(2,2,2,0.45)',
+                           padding : 0
                        }}
                        transition={{
                            duration : 1000,
@@ -112,21 +107,18 @@ function Classe(props: any ) {
                         fontWeight : 400,
                         color : isHeight ? 'rgba(0,119,255,0)' :'#0077FFFF',
                         left: 25,
-                        top : 4,
+                        top : '16%',
                         fontSize : 16,
                     }}> Bonjour ! <Text style={{
                         fontSize : 18,
                         fontWeight : 'bold',
                         fontFamily: 'Rockwell',
-                        color : isHeight ? 'rgba(0,119,255,0)' :'#0077FFFF',}}>{nom}</Text></Text>
-                {<FlatList
-                        data={}
-                        renderItem={({item}) => <FactComponent item={item}/>}
-                        style = {styles.flalisStyle}
-                        keyExtractor={(item) => item.id}
-                        scrollEventThrottle = {16}
-                        showsVerticalScrollIndicator={false}
-            />}
+                        color : isHeight ? 'rgba(0,119,255,0)' :'#ff5900',}}>{nom}</Text>
+                </Text>
+                {<FactComponent />}
+
+                    <DateAffiche isHeight={isHeight}/> <JoursAffiche isHeight={isHeight}/> <MoisAffiche isHeight={isHeight}/>
+
                 <TouchableOpacity onPress={handleHeight}>
                 <LottieView style={{
                     justifyContent : 'center',
@@ -363,7 +355,7 @@ function Classe(props: any ) {
             </View>
             ===================================   --* CLASSES *--   ======================================================
             <View style ={{
-                bottom : -90,// -80 en dessous du centre.
+                bottom : '-15%',// -80 en dessous du centre.
                 margin : 10,
             }}>
                 <Text style={{
@@ -393,7 +385,7 @@ const styles = StyleSheet.create({
     },
     vuePrinClasses :{
         flexDirection : "column",
-        bottom : -60, // -60 en dessous du centre.
+        bottom : '-15%', // -60 en dessous du centre.
     },
     ensembleClasse : {
         flexDirection : "row",

@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Image, useWindowDimensions, View, Text} from "react-native";
+import {StyleSheet, useWindowDimensions, View, Text} from "react-native";
 import LottieView from 'lottie-react-native';
 
 // CORRECTION MAJEURE ICI : Déstructurez 'item' de l'objet des props

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { View, StyleSheet, Animated, useWindowDimensions  } from 'react-native';
-import {AnimatedView} from "react-native-reanimated/lib/typescript/component/View";
 
 function Paginator({ data, scrollX }) { // Assurez-vous que scrollX est bien déstructuré ici
     if (!data || !Array.isArray(data) || data.length === 0) {
