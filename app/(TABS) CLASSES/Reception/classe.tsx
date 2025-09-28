@@ -1,26 +1,94 @@
 import React, {useState, useCallback } from 'react';
-import {View, StyleSheet, TouchableOpacity, Text, ActivityIndicator} from "react-native";
+import {
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    Text,
+    Dimensions, useWindowDimensions
+} from "react-native";
 import {MotiView} from "moti";
-import LottieView from "lottie-react-native";
 import {useNavigation,useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FactComponent from "@/app/Information/factComponent";
 import DateAffiche from "@/app/composants/dateAffiche";
 import JoursAffiche from "@/app/composants/jourAffiche";
 import MoisAffiche from "@/app/composants/moisAffiche";
+import Animated, {
+    Extrapolate,
+    interpolate,
+    useAnimatedGestureHandler,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
+} from "react-native-reanimated";
+import {GestureHandlerRootView, PanGestureHandler} from "react-native-gesture-handler";
+import LottieView from "lottie-react-native";
 
+const height = Dimensions.get('window').height;
 
-function Classe(props: any ) {
+const HEADER_HEIGHT = height - 50 ; // Définit la hauteur de base de l'en-tête.
 
-    const [isHeight, setHeight] = useState( false )// gere la longeur du composant Authentification
-    const handleHeight =  () => {
-        setHeight(!isHeight);
-    }
+function Classe(props: any, isDark ) {
+
+    const savedHeight = useSharedValue(HEADER_HEIGHT);
+    const translateY = useSharedValue(0);
+
+    const gestureHandler = useAnimatedGestureHandler({
+        // Quand le geste commence, on réinitialise la position du doigt.
+        onStart: () => {
+            translateY.value = 0;
+        },
+        // Pendant le geste, on met à jour la position du doigt.
+        onActive: (event) => {
+            translateY.value = event.translationY;
+        },
+        // Quand le geste se termine (doigt levé), on calcule la nouvelle hauteur et on l'anime.
+        onEnd: () => {
+            // Mappe la position du doigt à une nouvelle hauteur pour l'en-tête.
+            const newHeight = interpolate(
+                translateY.value,
+                [-200, 0, 200], // Si le doigt a bougé de -200 à 200...
+                [850, savedHeight.value, height + 980], // ...la nouvelle sera de 60 à 300.
+                Extrapolate.CLAMP// Empêche la valeur d'aller au-delà de ces limites.
+            );
+
+            // Anime la transition vers la nouvelle hauteur avec un effet de ressort.
+            savedHeight.value = withSpring(newHeight, {
+                damping: 16, // Plus la valeur est élevée, plus l'animation est amortie.
+                stiffness: 220, // Plus la valeur est élevée, plus l'animation est "rigide".
+            });
+
+            // Réinitialise la position du doigt pour le prochain geste.
+            translateY.value = 0;
+        },
+    });
+
+    const animatedHeaderStyle = useAnimatedStyle(() => {
+        // Calcule la hauteur de l'en-tête en temps réel pendant le glissement.
+        const height = interpolate(
+            translateY.value,
+            [200, 0, -200],
+            [savedHeight.value - 10, savedHeight.value, savedHeight.value + 580],
+            Extrapolate.CLAMP
+        );
+        return { height };
+    });
+
     // cette parti du code gere la navigation entre les ecrans
     const navigation = useNavigation();
 
     const [nom, setNom] = useState('');
     const [isLoading, setIsLoading] = useState(true); // Ajout de l'état de chargement
+
+    const handleReset = async() => {
+        try {
+            await AsyncStorage.clear();
+            alert(' Attention vos données viennes disparaitre ...')
+            navigation.navigate("ChoixRole");
+        } catch (error) {
+            console.error(" erreur lors des l'effacement des donnèes",error);
+        }
+    };
 
     const loadProfile = async () => {
         try {
@@ -52,20 +120,25 @@ function Classe(props: any ) {
             };
         }, [])
     ); // Le tableau de dépendances vide [] garantit que la fonction n'est pas recréée à chaque rendu
-
+    const {width} = useWindowDimensions();
     // Rendu conditionnel
     if (isLoading) {
         return (
             <View style={styles.centered}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <LottieView
+                    autoPlay // L'animation démarre automatiquement
+                    loop // L'animation se répète en boucle
+                    style={[styles.lottieAnimation, { width }]}
+                    source={require('@/assets/lotties/loading.json')} />
                 <Text style={{ fontSize : 18, color : '#0077FFFF',}}> Bonjours, chargement des données</Text>
             </View>
-        );    }
+        );
+    }
 
     return (
-        <View style={[styles.container, { backgroundColor : isHeight ? 'rgba(10,10,10,0.44)' : 'transparent',}]}>
+        <View style={[styles.container, { backgroundColor : isDark}]}>
             <TouchableOpacity
-                onPress={() => navigation.navigate("ecranProfile")}
+                onPress={() => navigation.navigate("ecranProfils")}
                 // Styles pour le bouton "Sauter"
                  style={{
                      position: 'absolute', // Positionnement absolu
@@ -76,301 +149,292 @@ function Classe(props: any ) {
                      borderRadius: 5,
                      zIndex: 10, // Assure que le bouton est au-dessus d'autres éléments
                         }}>
-                <Text>Profils</Text>
+                <Text>Params</Text>
             </TouchableOpacity>
 
-            =======================================   * MOTI RETRACTABLE *   ===============================================
-            <MotiView  style={[styles.motiView,]}
-                       from={{
-                           top : "0%",
-                           width : "100%",
-                           height : "1%",
-                           backgroundColor : 'rgba(222,222,222,0.17)',
-                       }}
-                       animate = {{
-                           top : '0%',
-                           width : isHeight ? '100%' : '100%',
-                           height : isHeight ?  '95%'  : '40%',
-                           borderBottomRightRadius : 45,
-                           borderBottomLeftRadius : 50,
-                           backgroundColor : isHeight ? 'rgba(10,10,10,0.44)' : 'rgba(2,2,2,0.45)',
-                           padding : 0
-                       }}
-                       transition={{
-                           duration : 1000,
-                           type: 'timing'
-                       }}>
-                <Text
-                    style = {{
-                        position : 'absolute',
-                        zIndex : 1,
-                        fontWeight : 400,
-                        color : isHeight ? 'rgba(0,119,255,0)' :'#0077FFFF',
-                        left: 25,
-                        top : '16%',
-                        fontSize : 16,
-                    }}> Bonjour ! <Text style={{
-                        fontSize : 18,
-                        fontWeight : 'bold',
-                        fontFamily: 'Rockwell',
-                        color : isHeight ? 'rgba(0,119,255,0)' :'#ff5900',}}>{nom}</Text>
-                </Text>
-                {<FactComponent />}
+            =======================================   * LA PARTIE RETRACTABLE *   ===============================================
+            <View>
+            </View>
+            <GestureHandlerRootView>
+                    {/* Le PanGestureHandler écoute les glissements. */}
+                    <PanGestureHandler onGestureEvent={gestureHandler}>
+                        <Animated.View style={[styles.header, animatedHeaderStyle]}>
+                            <Text style={{
+                                position: 'absolute', // Positionnement absolu
+                                top: 50, // Ajustez la position verticale
+                                left: 20, // Ajustez la position horizontale
+                                padding: 10,
+                                // backgroundColor: 'rgba(0,0,0,0.2)', // Optionnel: un léger fond
+                                borderRadius: 5,
+                                zIndex: 10,
+                                fontWeight : '500',
+                            }}>bonjour <Text style={{
+                                    fontSize : 14,
+                                    fontWeight : '700',
+                                    fontFamily : 'system',
+                                color : '#FD7F00FF',
+                            }}>
+                                {nom}
+                            </Text>
+                            </Text>
+                            <FactComponent/>
+                            <View style = {{flex : 1, justifyContent: "space-evenly", flexDirection:'row'}}>
+                            <JoursAffiche /> <MoisAffiche /> <DateAffiche/>
+                            </View>
+                            <Text style={{
+                                fontWeight : 400,
+                                fontSize : 14,
+                                marginBottom : 20,
+                                color : 'rgba(0,0,0,0.41)'
+                            }}> Swipe vers le bas </Text>
+                            <View style={styles.vuePrinClasses}>
+                                <View style={styles.ensembleClasse}>
+                                    <View style={styles.classeMin}>
+                                        {/* 1 er */}
+                                        <TouchableOpacity
+                                            onPress={() => navigation.navigate("EcransDesPremieres")}>
+                                            <MotiView
+                                                style={{
+                                                    overflow : 'hidden',
+                                                    flexDirection: "row", // STYLES des composant à l'interieur de la vue
+                                                }}
+                                                from = {{
+                                                    width : 25,
+                                                    height : 25,
+                                                    backgroundColor : "#1a9cd7",
+                                                    borderRadius : 12.5,
+                                                }}
+                                                animate = {{
+                                                    width : 200,
+                                                    height : 91.25,
+                                                    margin : 2.5,
+                                                    borderTopLeftRadius : 50,
+                                                    borderRadius : 4,
 
-                    <DateAffiche isHeight={isHeight}/> <JoursAffiche isHeight={isHeight}/> <MoisAffiche isHeight={isHeight}/>
+                                                }}
+                                                transition = {{
+                                                    duration : 500,
+                                                    type: "timing"
+                                                }}>
+                                                <Text style = {{
+                                                    fontWeight : 900,
+                                                    fontSize : 40,
+                                                    textAlign : 'start',
+                                                    margin : 0,
+                                                    top : 45,
+                                                    left : 15,
+                                                    color : '#dedede',}}>
+                                                    1</Text>
+                                                <Text style = {{
+                                                    fontWeight : '700',
+                                                    fontSize : 36,
+                                                    textAlign : 'start',
+                                                    left : 15,
+                                                    top : 50,
+                                                    color : 'rgba(222,222,222,0.66)',
+                                                }}>Humanitè</Text>
+                                                <Text style = {{
+                                                    fontWeight : 900,
+                                                    fontSize : 70,
+                                                    textAlign : 'start',
+                                                    left : -100,
+                                                    top : -50,
+                                                    color : 'rgba(222,222,222,0.33)',
+                                                    transform : [{ rotate : '-50 deg'}],
+                                                }}>Hum</Text>
 
-                <TouchableOpacity onPress={handleHeight}>
-                <LottieView style={{
-                    justifyContent : 'center',
-                    alignItems : 'center',
-                    width : 40,
-                    height : 20,
-                    marginLeft : 20,
-                    transform : isHeight ? [{ rotate : '270 deg'}] : [{ rotate : '90 deg'}]
-                }}
-                            autoPlay
-                            loop
-                            source={require('@/assets/lotties/lottieflow-arrow-04-1-000000-easey.json')}/>
-            </TouchableOpacity>
-            </MotiView>
-            ===================================   --* MOTI RETRACTABLE *--   ======================================================
+                                            </MotiView>
+                                        </TouchableOpacity>
+                                        {/* 2 eme */}
+                                        <TouchableOpacity
+                                            onPress={() => navigation.navigate("EcransDesDeuxiemes")}>
+                                            <MotiView
+                                                style={{
+                                                    overflow : 'hidden',
+                                                    flexDirection: "row", // STYLES des composant à l'interieur de la vue
+                                                }}
+                                                from = {{
+                                                    width : 25,
+                                                    height : 25,
+                                                    backgroundColor : "#1a9cd7",
+                                                    borderRadius : 12.5,
+                                                }}
+                                                animate = {{
+                                                    width : 200,
+                                                    height : 91.25,
+                                                    margin : 2.5,
+                                                    borderRadius : 4,
+                                                }}
+                                                transition = {{
+                                                    duration : 1000,
+                                                    type: "timing"
+                                                }}>
+                                                <Text style = {{
+                                                    fontWeight : 900,
+                                                    fontSize : 40,
+                                                    textAlign : 'start',
+                                                    margin : 0,
+                                                    top : 45,
+                                                    left : 15,
+                                                    color : '#dedede',}}>
+                                                    2</Text>
+                                                <Text style = {{
+                                                    fontWeight : "700",
+                                                    fontSize : 36,
+                                                    textAlign : 'start',
+                                                    left : 15,
+                                                    top : 50,
+                                                    color : 'rgba(222,222,222,0.66)',
+                                                }}>Humanitè</Text>
+                                                <Text style = {{
+                                                    fontWeight : 900,
+                                                    fontSize : 70,
+                                                    textAlign : 'start',
+                                                    left : -120,
+                                                    top : -45,
+                                                    color : 'rgba(222,222,222,0.33)',
+                                                    transform : [{ rotate : '-35 deg'}],
+                                                }}>Hum</Text>
+                                            </MotiView>
+                                        </TouchableOpacity>
+                                    </View>
+                                    {/* 3 eme */}
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate("EcransDesTroisiemes")}>
+                                        <MotiView
+                                            style={{
+                                                overflow : 'hidden',
+                                                flexDirection: "column", // STYLES des composant à l'interieur de la vue
+                                            }}
+                                            from = {{
+                                                width : 25,
+                                                height : 50,
+                                                backgroundColor : "#1a9cd7",
+                                                borderRadius : 12.5,
+                                            }}
+                                            animate = {{
+                                                width : 100,
+                                                height : 188,
+                                                margin : 2.5,
+                                                borderTopRightRadius: 50,
+                                                borderRadius : 0,
+                                            }}
+                                            transition = {{
+                                                duration : 1500,
+                                                type: "timing"
+                                            }}>
+                                            <Text style = {{
+                                                fontWeight : 900,
+                                                fontSize : 40,
+                                                textAlign : 'start',
+                                                margin : 10,
+                                                top : 37,
+                                                color : '#dedede',
+                                            }}>3</Text>
+                                            <Text style = {{
+                                                fontWeight : '700',
+                                                fontSize : 36,
+                                                textAlign : 'start',
+                                                right : -3,
+                                                top: 15,
+                                                color : 'rgba(222,222,222,0.66)',
+                                            }}>Hum</Text><Text style = {{
+                                            fontWeight : 900,
+                                            fontSize : 75,
+                                            textAlign : 'start',
+                                            left : 10,
+                                            top : -20,
+                                            color : 'rgba(222,222,222,0.42)',
+                                            transform : [{ rotate : '0 deg'}],
+                                        }}>Hum</Text>
+                                        </MotiView>
+                                    </TouchableOpacity>
+                                </View>
+                                {/* 4 eme */}
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate("EcransDesQuatriemes")}>
+                                    <MotiView
+                                        style={{
+                                            flexDirection: "row", // STYLES des composant à l'interieur de la vue
+                                        }}
+                                        from = {{
+                                            width : 25,
+                                            height : 25,
+                                            backgroundColor : "#1a9cd7",
+                                            borderRadius : 12.5,
+                                        }}
+                                        animate = {{
+                                            width : 305,
+                                            height : 85,
+                                            margin : 2.5,
+                                            borderBottomEndRadius : 50,
+                                            borderBottomStartRadius : 50,
+                                            borderRadius : 4,
+                                        }}
+                                        transition = {{
+                                            duration : 1250,
+                                            type: "timing"
+                                        }}>
+                                        <Text style = {{
+                                            fontWeight : 900,
+                                            fontSize : 40,
+                                            textAlign : 'start',
+                                            margin : 0,
+                                            top : 25,
+                                            left : 15,
+                                            color : '#dedede',}}>
+                                            4</Text>
+                                        <Text style = {{
+                                            fontFamily : 'system',
+                                            fontWeight : 700,
+                                            fontSize : 36,
+                                            textAlign : 'start',
+                                            left : 15,
+                                            top : 31,
+                                            color : 'rgba(222,222,222,0.66)',
+                                        }}>Humanitè</Text>
+                                        <Text style = {{
+                                            fontFamily : 'system',
+                                            fontWeight : 900,
+                                            fontSize : 70,
+                                            textAlign : 'start',
+                                            left : -90,
+                                            top : -35,
+                                            color : 'rgba(222,222,222,0.33)',
+                                            transform : [{ rotate : '-20 deg'}],
+                                        }}>4 ème</Text>
+                                    </MotiView>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style ={{
+                            marginHorizontal : 10,
+                                marginVertical : 40,
+                        }}>
+                            <Text style={{
+                                fontWeight : 700,
+                                color : '#FD7F00FF',
+                                fontSize : 18,
+                            }}> INFO :</Text>
+                            <Text style={{
+                                fontWeight : 400,
+                                fontSize : 16,
+                            }}>
+                                Fait le choix des syllabus dans toutes les classes, compare et apprend comme si tu etais dans les classes inférieurs et supérieurs en même temps.
+                            </Text>
+                        </View>
+
+                        </Animated.View>
+                    </PanGestureHandler>
+
+            </GestureHandlerRootView>
+
+            ===================================   --* LA PARTIE RETRACTABLE *--   ======================================================
 
             ===================================   * CLASSES *   ======================================================
-            <View style={styles.vuePrinClasses}>
-                <View style={styles.ensembleClasse}>
-                    <View style={styles.classeMin}>
-                        {/* 1 er */}
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate("EcransDesPremieres")}>
-                            <MotiView
-                                style={{
-                                    overflow : 'hidden',
-                                    flexDirection: "row", // STYLES des composant à l'interieur de la vue
-                                }}
-                                from = {{
-                                    width : 25,
-                                    height : 25,
-                                    backgroundColor : "#1a9cd7",
-                                    borderRadius : 12.5,
-                                }}
-                                animate = {{
-                                     width : 200,
-                                     height : 91.25,
-                                    margin : 2.5,
-                                    borderTopLeftRadius : 50,
-                                    borderRadius : 4,
 
-                                }}
-                                transition = {{
-                                    duration : 500,
-                           type: "timing"
-                                }}>
-                                <Text style = {{
-                                    fontWeight : 900,
-                                    fontSize : 40,
-                                    textAlign : 'start',
-                                    margin : 0,
-                                    top : 45,
-                                    left : 15,
-                                    color : '#dedede',}}>
-                                    1</Text>
-                                <Text style = {{
-                                    fontWeight : 900,
-                                    fontSize : 35,
-                                    textAlign : 'start',
-                                    left : 15,
-                                    top : 50,
-                                    color : 'rgba(222,222,222,0.66)',
-                                }}>Humanitè</Text>
-                                <Text style = {{
-                                    fontWeight : 900,
-                                    fontSize : 70,
-                                    textAlign : 'start',
-                                    left : -100,
-                                    top : -50,
-                                    color : 'rgba(222,222,222,0.33)',
-                                    transform : [{ rotate : '-50 deg'}],
-                                }}>Hum</Text>
-
-                            </MotiView>
-                        </TouchableOpacity>
-                        {/* 2 eme */}
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate("EcransDesDeuxiemes")}>
-                        >
-                            <MotiView
-                                style={{
-                                    overflow : 'hidden',
-                                    flexDirection: "row", // STYLES des composant à l'interieur de la vue
-                                }}
-                                from = {{
-                                    width : 25,
-                                    height : 25,
-                                    backgroundColor : "#1a9cd7",
-                                    borderRadius : 12.5,
-                                }}
-                                animate = {{
-                                    width : 200,
-                                    height : 91.25,
-                                    margin : 2.5,
-                                    borderRadius : 4,
-                                }}
-                                transition = {{
-                                    duration : 1000,
-                           type: "timing"
-                                }}>
-                                <Text style = {{
-                                    fontWeight : 900,
-                                    fontSize : 40,
-                                    textAlign : 'start',
-                                    margin : 0,
-                                    top : 45,
-                                    left : 15,
-                                    color : '#dedede',}}>
-                                    2</Text>
-                                <Text style = {{
-                                    fontWeight : 900,
-                                    fontSize : 35,
-                                    textAlign : 'start',
-                                    left : 15,
-                                    top : 50,
-                                    color : 'rgba(222,222,222,0.66)',
-                                }}>Humanitè</Text>
-                                <Text style = {{
-                                    fontWeight : 900,
-                                    fontSize : 70,
-                                    textAlign : 'start',
-                                    left : -120,
-                                    top : -45,
-                                    color : 'rgba(222,222,222,0.33)',
-                                    transform : [{ rotate : '-35 deg'}],
-                                }}>Hum</Text>
-                            </MotiView>
-                        </TouchableOpacity>
-                    </View>
-                    {/* 3 eme */}
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate("EcransDesTroisiemes")}>
-                        <MotiView
-                            style={{
-                                overflow : 'hidden',
-                                flexDirection: "column", // STYLES des composant à l'interieur de la vue
-                            }}
-                            from = {{
-                                width : 25,
-                                height : 50,
-                                backgroundColor : "#1a9cd7",
-                                borderRadius : 12.5,
-                            }}
-                            animate = {{
-                                width : 100,
-                                height : 188,
-                                margin : 2.5,
-                                borderTopRightRadius: 50,
-                                borderRadius : 0,
-                            }}
-                            transition = {{
-                                duration : 1500,
-                           type: "timing"
-                            }}>
-                            <Text style = {{
-                                fontWeight : 900,
-                                fontSize : 40,
-                                textAlign : 'start',
-                                margin : 10,
-                                color : '#dedede',
-                            }}>3</Text>
-                            <Text style = {{
-                                fontWeight : 900,
-                                fontSize : 30,
-                                textAlign : 'start',
-                                right : -3,
-                                top : -20,
-                                color : 'rgba(222,222,222,0.73)',
-                            }}>Hum</Text><Text style = {{
-                            fontWeight : 900,
-                            fontSize : 75,
-                            textAlign : 'start',
-                            left : 10,
-                            top : -30,
-                            color : 'rgba(222,222,222,0.42)',
-                            transform : [{ rotate : '0 deg'}],
-                        }}>Hum</Text>
-                        </MotiView>
-                    </TouchableOpacity>
-                </View>
-                {/* 4 eme */}
-                <TouchableOpacity
-                    onPress={() => navigation.navigate("EcransDesQuatriemes")}>
-                    <MotiView
-                        style={{
-                            flexDirection: "row", // STYLES des composant à l'interieur de la vue
-                        }}
-                        from = {{
-                            width : 25,
-                            height : 25,
-                            backgroundColor : "#1a9cd7",
-                            borderRadius : 12.5,
-                        }}
-                        animate = {{
-                            width : 305,
-                            height : 85,
-                            margin : 2.5,
-                            borderBottomEndRadius : 50,
-                            borderBottomStartRadius : 50,
-                            borderRadius : 4,
-                        }}
-                        transition = {{
-                            duration : 1250,
-                           type: "timing"
-                        }}>
-                        <Text style = {{
-                            fontWeight : 900,
-                            fontSize : 40,
-                            textAlign : 'start',
-                            margin : 0,
-                            top : 25,
-                            left : 15,
-                            color : '#dedede',}}>
-                            4</Text>
-                        <Text style = {{
-                            fontWeight : 900,
-                            fontSize : 35,
-                            textAlign : 'start',
-                            left : 15,
-                            top : 31,
-                            color : 'rgba(222,222,222,0.66)',
-                        }}>Humanitè</Text>
-                        <Text style = {{
-                            fontWeight : 900,
-                            fontSize : 70,
-                            textAlign : 'start',
-                            left : -90,
-                            top : -35,
-                            color : 'rgba(222,222,222,0.33)',
-                            transform : [{ rotate : '-20 deg'}],
-                        }}>4 ème</Text>
-                    </MotiView>
-                </TouchableOpacity>
-            </View>
             ===================================   --* CLASSES *--   ======================================================
-            <View style ={{
-                bottom : '-15%',// -80 en dessous du centre.
-                margin : 10,
-            }}>
-                <Text style={{
-                    fontWeight : 800,
-                    color : '#1a9cd7',
-                    fontSize : 14,
-                    marginBottom :10 ,
-                }}> INFO :</Text>
-                <Text style={{
-                    fontWeight : 400,
-                    fontSize : 15,
-                }}>
-                    Fait le choix des syllabus dans toutes les classes, compare et apprend comme si tu etais dans les classes inférieurs et supérieurs.
-                </Text>
-            </View>
+
 
         </View>
 
@@ -382,10 +446,10 @@ const styles = StyleSheet.create({
       flex : 1,
       justifyContent : "center",
       alignItems : "center",
+        paddingHorizontal : 5
     },
     vuePrinClasses :{
         flexDirection : "column",
-        bottom : '-15%', // -60 en dessous du centre.
     },
     ensembleClasse : {
         flexDirection : "row",
@@ -399,6 +463,8 @@ const styles = StyleSheet.create({
         zIndex : 1,
         padding: 5,
         top: 50,
+        alignItems: 'center',
+        justifyContent : 'center',
     },
     flalisStyle : {
         flex : 1,
@@ -408,6 +474,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    height : {
+        height : 3,
+        width : '50%',
+        backgroundColor : 'rgba(255,255,255,0.47)',
+        borderRadius: '10%'
+    },
+    header: {
+        backgroundColor: "rgba(0,0,0,0)",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 20,
+    },
+    lottieAnimation: {
+        flex: 0.7, // Prend la même proportion que votre ancienne image
+        justifyContent: 'center',
+        alignSelf: 'center', // Centre l'animation horizontalement
+        // Vous pouvez ajuster la hauteur si nécessaire, par exemple height: 300,
+    },
+
 })
 
 export default Classe;

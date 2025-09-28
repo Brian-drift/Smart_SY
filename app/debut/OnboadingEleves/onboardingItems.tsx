@@ -37,15 +37,15 @@ const styles = StyleSheet.create({
         // Vous pouvez ajuster la hauteur si nécessaire, par exemple height: 300,
     },
     titre: {
-        fontWeight: '900',
-        fontSize: 32,
+        fontWeight: '700',
+        fontSize: 34,
         color: "#0077ff",
         marginBottom: 15,
         textAlign: "left",
     },
     description: {
         fontSize: 18,
-        fontWeight: '300',
+        fontWeight: 400,
         textAlign: 'center',
         color: '#000000',
         paddingHorizontal: 64,

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import {View, Text, Button, StyleSheet, Alert, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {darkTheme, lightTheme} from "@/app/themes";
+import {useNavigation} from "@react-navigation/native";
 
 const ProfilScreen = () => {
+    const navigation = useNavigation();
     // L'état du formulaire (ce qui est tapé dans les TextInput)
     const [nom, setNom] = useState('');
     const  [classe, setClasse] = useState('');
@@ -10,6 +13,21 @@ const ProfilScreen = () => {
     // L'état des données affichées (ce qui est sauvegardé)
     const [nomAffiche, setNomAffiche] = useState('')
     const [classeAffiche, setClasseAffiche] = useState('')
+
+    const [isDark, setIsDark] = useState(false);
+
+    // choisir le bon thème
+    const theme = isDark ? darkTheme : lightTheme;
+
+    const handleReset = async () => {
+        try {
+            await AsyncStorage.clear();
+            navigation.navigate("ChoixRole");
+        }
+        catch(e) {
+            console.error(" erreur lors des l'effacement des donnèes",e);
+        }
+    }
 
     // Fonction pour charger les données sauvegardées au démarrage
     const loadProfile = async () => {
@@ -55,35 +73,21 @@ const ProfilScreen = () => {
     }, []);
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Écran de Profil</Text>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
+            <Text style={styles.title}>Parametres</Text>
             {/* --------------------------------------------------- */}
             {/* Les informations sauvegardées s'affichent ici */}
             {/* --------------------------------------------------- */}
-            <View style={styles.savedDataContainer}>
-                <Text style={styles.savedTitle}>Ce que je sais de TOI</Text>
-                <Text style={styles.savedText}>Tu t'appelle: {nomAffiche}</Text>
-                <Text style={styles.savedText}>Tu est en : {classeAffiche}</Text>
-                <Text style={styles.savedDescription}>Sachez que vous pouvais changer ses données plus tard quand vous voudraiz.</Text>
+            <View style={[styles.savedDataContainer, {borderColor: theme.mainColor,}]}>
+                <Text style={[styles.savedText, { color: theme.text }]}>{nomAffiche}</Text>
             </View>
-
-            {/* Les TextInput sont liés aux variables du formulaire */}
-            <Text style={styles.label}>Nom</Text>
-            <TextInput
-                style={styles.input}
-                value={nom}
-                onChangeText={setNom}
-                placeholder="Entrez votre nom"
-            />
-            <Text style={styles.label}>Ta classe</Text>
-            <TextInput
-                style={styles.input}
-                value={classe}
-                onChangeText={setClasse}
-                placeholder="Entrez votre classe"
-            />
-
-            <Button title="Sauvegarder" onPress={saveProfile} />
+            <Button title={'Recommencer'} onPress={handleReset}/>
+            <TouchableOpacity style={styles.button} onPress={() => setIsDark(!isDark)}>
+                <Text style={{ color: theme.text }}>Changer le Thème</Text>
+            </TouchableOpacity>
+            <Text>
+                NB / cette partie est en cours de développement.
+            </Text>
         </View>
     );
 };
@@ -93,6 +97,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#f5f5f5',
+        justifyContent : "space-evenly"
     },
     title: {
         fontSize: 24,
@@ -104,13 +109,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 5,
         marginTop: 10,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+    },button: {
         padding: 10,
-        marginBottom: 15,
+        borderRadius: 5,
+        borderWidth: 1,
     },
     savedDataContainer: {
         marginTop: 30,
@@ -119,20 +121,10 @@ const styles = StyleSheet.create({
         borderColor: '#007bff',
         borderRadius: 8,
     },
-    savedTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    savedDescription: {
-        fontSize: 14,
-        fontWeight: 'light',
-        marginBottom: 10,
-        marginTop: 10,
-    },
     savedText: {
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: '700',
+        fontFamily: 'Roboto',
     },
 });
 

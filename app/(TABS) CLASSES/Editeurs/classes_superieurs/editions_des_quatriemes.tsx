@@ -10,11 +10,15 @@ import {
     View
 } from "react-native";
 import SyllabusCards from "@/app/composants/syllabus_card";
+import {useRoute} from "@react-navigation/native";
+import SyllabusCardProfesseurs from "@/app/composants/syllabusPourLesProfs";
 
-const EcransDesPremieres = () => {
+const EditionsDesQuatriemes = () => {
     const [isModalOpen, setModalOpen] =useState(false);
     const [inputText, setInputText] = useState('');
     const [syllabusList, setSyllabusList] = useState([]);
+    const route = useRoute();
+    const {item} = route.params
 
     const handleAddSyllabus = () => {
         if (inputText.trim() !== '') {
@@ -26,11 +30,16 @@ const EcransDesPremieres = () => {
     };
 
     const renderItem = ({ item }) => (
-        <SyllabusCards text={item.text} />
+        <SyllabusCardProfesseurs text={item.text} />
     );
 
     return (
         <SafeAreaView style={styles.container}>
+            <Text style={styles.title}> Quatrièmes </Text>
+            <Text  style={styles.textDim}>
+                {item.diminutif}
+            </Text>
+
             <FlatList
                 numColumns={2}
                 data={syllabusList}
@@ -94,17 +103,6 @@ const styles = StyleSheet.create({
         padding: 0,
         width: '100%',
     },
-    renderItem: {
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        backgroundColor: '#ffffff',
-        width: '40%',
-        height: '35%',
-        marginTop: 20,
-        borderRadius: 18,
-        borderWidth: .5,
-        borderColor: '#e0e0e0',
-    },
     addButton: {
         position: 'absolute',
         borderRadius: 25,
@@ -124,11 +122,68 @@ const styles = StyleSheet.create({
     },
     viewInModalContainer: {
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         backgroundColor: 'white',
         width: '75%',
-        height: '40%',
+        height: '30%',
         borderRadius: 18,
+    },
+    txt: {
+        marginTop: 15,
+        fontSize: 24,
+        color: 'black',
+        textAlign: 'center',
+        fontWeight: '700',
+    },
+    princ: {
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        flexDirection: 'row',
+        top: 15,
+        width: '100%',
+        height: 50,
+    },
+    btnGroup: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '40%',
+        height: 40,
+        backgroundColor: 'rgba(190,190,190,0)',
+        borderRadius: 10,
+    },
+    btnGroup1: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '40%',
+        height: 40,
+        backgroundColor: 'rgba(143,143,143,0)',
+        borderRadius: 10,
+    },
+    text1: {
+        fontWeight: 'bold',
+        color: '#1a9bd5',
+    },
+    text2: {
+        fontWeight: 'bold',
+        color: 'rgba(0,0,0,0.52)',
+    },
+    title: {
+        marginTop : 35,
+        marginLeft : 20,
+        fontSize: 30,
+        color: '#353535',
+        fontWeight: 700,
+        fontFamily : 'system',
+    },
+    textDim : {
+        marginTop : 35,
+        marginLeft : 190,
+        position: 'absolute',
+        zIndex : 12,
+        fontSize: 30,
+        color: '#8f8f8f',
+        fontWeight: 700,
+        fontFamily : 'system',
     },
     textInp: {
         fontSize: 16,
@@ -144,45 +199,6 @@ const styles = StyleSheet.create({
         borderRadius: 17,
         width: '90%',
         marginTop: 15,
-    },
-    txt: {
-        marginTop: 15,
-        fontSize: 40,
-        color: 'black',
-        textAlign: 'left',
-        fontWeight: '900',
-    },
-    princ: {
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        flexDirection: 'row',
-        top: 15,
-        width: '100%',
-        height: 50,
-    },
-    btnGroup: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '40%',
-        height: 40,
-        backgroundColor: '#2E75B6',
-        borderRadius: 10,
-    },
-    btnGroup1: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '40%',
-        height: 40,
-        backgroundColor: '#002B82',
-        borderRadius: 10,
-    },
-    text1: {
-        fontWeight: 'bold',
-        color: '#002B82',
-    },
-    text2: {
-        fontWeight: 'bold',
-        color: '#2E75B6',
-    }
+},
 })
-export default EcransDesPremieres;
+export default  EditionsDesQuatriemes;

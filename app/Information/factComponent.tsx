@@ -92,8 +92,9 @@ const FactListScreen = () => {
                     onEndReached={fetchMoreFacts}
                     onEndReachedThreshold={0.5}
                     ListFooterComponent={renderFooter}
-                    onRefresh={fetchMultipleFacts} // <== NOUVEAU !
-                    refreshing={refreshing} // <== NOUVEAU !
+                    onRefresh={fetchMultipleFacts}
+                    refreshing={refreshing}
+                    inverted={true}
                 />
             )}
         </View>
@@ -106,8 +107,10 @@ const styles = StyleSheet.create({
         paddingTop : '20%',
         padding: 20,
         backgroundColor: '#f0f0f0',
-        borderBottomRightRadius : 45,
-        borderBottomLeftRadius : 50,
+        borderBottomRightRadius : 10,
+        borderBottomLeftRadius : 10,
+        width: '100%',
+        marginBottom : 5,
     },
     factText: {
         fontSize: 16,

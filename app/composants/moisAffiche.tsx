@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {Text} from "react-native";
 
-function MoisAffiche({isHeight}) {
+function MoisAffiche() {
     const [monthName, setMonthName] = useState<string>("");
     const textStyle = {
-        color : isHeight ? 'rgba(255,255,255,0)' : 'rgba(0,0,0,0.32)',
+        color :  'rgba(3,3,3,0.31)',
     };
 
     useEffect(() => {
@@ -15,12 +15,10 @@ function MoisAffiche({isHeight}) {
 
     return (
         <Text style={[{
-            position : 'absolute',
-            zIndex : 1,
-            fontWeight : 900,
-            bottom : '15%',
-            left : '36%',
-            fontSize : 26,
+            marginHorizontal : 10,
+            top : 37,
+            fontWeight : 700,
+            fontSize : 30,
         }, textStyle]}>
             {monthName}
         </Text>
