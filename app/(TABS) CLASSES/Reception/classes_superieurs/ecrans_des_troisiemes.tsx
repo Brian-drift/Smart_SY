@@ -1,43 +1,46 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, View, StyleSheet } from "react-native";
+import React, { useEffect} from "react";
+import {FlatList, View, StyleSheet, ActivityIndicator, Text, SafeAreaView} from "react-native";
 import SyllabusCard from "@/app/composants/syllabus_card";
+import {fetchCours3eme} from "@/app/composants/listeDesCours";
 
-export default function EcransDesPremieres() {
-    const [dogs, setDogs] = useState<string[]>([]); // tableau d'images
-    const [refreshing, setRefreshing] = useState(false);
-
-    const fetchDogs = async () => {
-        try {
-            setRefreshing(true);
-            // API qui renvoie plusieurs images aléatoires
-            const res = await fetch("https://dog.ceo/api/breeds/image/random/2000");
-            const json = await res.json();
-            setDogs(json.message); // message est un tableau d’URLs
-        } catch (error) {
-            console.error("Erreur API:", error);
-        } finally {
-            setRefreshing(false);
-        }
-    };
+export default function EcransDesTroisiemes() {
+    const [cours, setCours] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
 
     useEffect(() => {
-        fetchDogs();
+        fetchCours3eme()
+            .then(data => {
+                setCours(data)
+            })
+            .catch(e => alert("'Une erreur c'est produite lors du chargement des donneées"))
+            .finally(() => {
+                setLoading(false);
+            })
     }, []);
 
+    if (loading) {
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator color={'black'} size="large" />
+                <Text style={{ fontSize : 18, color : '#626262',}}> Bonjours, chargement des données</Text>
+            </View>
+        );
+    }
+
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <FlatList
                 numColumns={2}
-                data={dogs}
-                renderItem={({ item, index }) => (
-                    <SyllabusCard id={index.toString()} imageUrl={item} />
-                )}
-                keyExtractor={(_, index) => index.toString()}
+                data={cours}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => (
+                    <SyllabusCard title={item.title} editeur={item.editeur} classe={item.classe}/>)}
                 contentContainerStyle={{ padding: 10 }}
-                refreshing={refreshing}
-                onRefresh={fetchDogs}
             />
-        </View>
+            <View style={{padding: 10, borderTopWidth: 1, borderColor : 'rgba(0,0,0,0.31)'}}>
+                <Text style={{textAlign : "center", marginBottom : 20, fontWeight : 400,}}> Si le syllabus que vous cherchez ne se trouve pas dans cette liste, nous vous prions de bien vouloirs contacter le professeurs concernés par le cours pour qu'il veuille bien l'ajouter </Text>
+            </View>
+        </SafeAreaView>
     );
 }
 
@@ -45,5 +48,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#f2f2f2",
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop : 30
+    },
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

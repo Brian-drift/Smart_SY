@@ -25,7 +25,7 @@ import EditionsDesPemieres from "@/app/(TABS) CLASSES/Editeurs/classes_superieur
 import EditionsDesPremieres from "@/app/(TABS) CLASSES/Editeurs/classes_superieurs/editions_des_premieres";
 import EditionsDesTroisiemes from "@/app/(TABS) CLASSES/Editeurs/classes_superieurs/editions_des_troisiemes";
 import EditionsDesQuatriemes from "@/app/(TABS) CLASSES/Editeurs/classes_superieurs/editions_des_quatriemes";
-import PDFUploader from "@/app/(TABS) CLASSES/Editeurs/pdfUploader";
+import PdfScreen from "@/app/(TABS) CLASSES/Reception/pdfScreen";
 
 // Nouveau composant pour l'écran de choix de rôle
 const ChoixRoleScreen = ({ navigation }) => {
@@ -108,7 +108,7 @@ export default function Index() {
             <Stack.Screen name={"glxArc"} component={glxArc}/>
             <Stack.Screen name={"ProfesseurDashboardGala"} component={EditeursGalaxie}/>
             <Stack.Screen name={"choixDesClasses"} component={ChoixDesClasses}/>
-            <Stack.Screen name={"pdfploader"} component={PDFUploader}/>
+            <Stack.Screen name={"pdfScreen"} component={PdfScreen}/>
 
             <Stack.Screen name={"ecranProfils"} component={ecranProfils} />
         </Stack.Navigator>

@@ -11,9 +11,8 @@ function DateAffiche() {
     return (
         <Text style={[{
             top : 12,
-            fontFamily : 'system',
             fontWeight : 700,
-            fontSize : 60,
+            fontSize : 38,
         }]}> {day} </Text>
     );
 }

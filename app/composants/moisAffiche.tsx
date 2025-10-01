@@ -16,7 +16,7 @@ function MoisAffiche() {
     return (
         <Text style={[{
             marginHorizontal : 10,
-            top : 37,
+            top : 22,
             fontWeight : 700,
             fontSize : 30,
         }, textStyle]}>

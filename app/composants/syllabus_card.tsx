@@ -1,16 +1,19 @@
-import React from "react";
-import { View, Image, StyleSheet } from "react-native";
+import {View, StyleSheet, TouchableNativeFeedback, Text} from "react-native";
+import {useNavigation} from "@react-navigation/native";
 
-type Props = {
-    id: string;
-    imageUrl: string;
-};
+export default function SyllabusCard( item) {
 
-export default function SyllabusCard({ id, imageUrl }: Props) {
+    const navigation = useNavigation();
+
     return (
-        <View style={styles.card}>
-            <Image source={{ uri: imageUrl }} style={styles.image} />
-        </View>
+        <TouchableNativeFeedback onPress={navigation.navigate('pdfScreen')}>
+            <View style={styles.card}>
+                <Text  style={styles.title}>{item.title}</Text>
+                <Text  style={styles.editeur}>{item.editeur}</Text>
+                <Text  style={styles.classe}>{item.classe}</Text>
+            </View>
+        </TouchableNativeFeedback>
+
     );
 }
 
@@ -23,8 +26,8 @@ const styles = StyleSheet.create({
         width: '40%',
         height: 180,
         borderWidth: 5,
-        borderRadius: 8,
-        borderColor: '#ffffff',
+        borderRadius: 15,
+        borderColor: 'rgba(255,255,255,0)',
         top : 3,
         margin: 20,
         // Ombres pour iOS
@@ -38,9 +41,26 @@ const styles = StyleSheet.create({
         // Ombre pour Android
         elevation: 10,
     },
-    image: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 8,
+    title : {
+        textAlign: 'center',
+        fontSize: 24,
+        color: '#353535',
+        fontWeight: 700,
+        fontFamily : 'system',
+
+    },
+    editeur : {
+        textAlign: 'left',
+        fontSize: 12,
+        color: '#8e8e8e',
+        fontWeight: 400,
+        fontFamily : 'system',
+    },
+    classe : {
+        textAlign: 'left',
+        fontSize: 14,
+        color: '#8e8e8e',
+        fontWeight: 400,
+        fontFamily : 'system',
     },
 });

@@ -19,14 +19,11 @@ const FactListScreen = () => {
 
             const translatedText = translationData.responseData.translatedText;
             if (translatedText.includes('WARNING')) {
-                setErrorMessage('Désolé, la traduction est momentanément indisponible.');
-                return null;
+                return setErrorMessage("Traduction des faits momentanemt indisponible.");
             }
             return translatedText;
         } catch (error) {
-            console.error('Erreur lors de la récupération ou de la traduction du fait :', error);
-            setErrorMessage('Erreur lors du chargement des faits.');
-            return null;
+            return setErrorMessage("Vous êtez hors lignes");
         }
     };
 
@@ -48,26 +45,9 @@ const FactListScreen = () => {
         setRefreshing(false); // <== NOUVEAU !
     };
 
-    const fetchMoreFacts = async () => {
-        if (loadingMore) return;
-        setLoadingMore(true);
-        const numberOfFacts = 5;
-        const newFacts = [];
-        for (let i = 0; i < numberOfFacts; i++) {
-            const fact = await fetchSingleFact();
-            if (fact) {
-                newFacts.push({ key: fact + Math.random(), text: fact });
-            }
-        }
-        setFacts([...facts, ...newFacts]);
-        setLoadingMore(false);
-    };
 
-    useEffect(() => {
-        fetchMultipleFacts();
-    }, []);
-
-    const renderItem = ({ item }) => <Text style={styles.factText}>{item.text}</Text>;
+    const renderItem = ({ item }) => <Text style={styles.factText}>{item.text}</Text>
+     ;
 
     const renderFooter = () => {
         if (!loadingMore) return null;
@@ -81,21 +61,23 @@ const FactListScreen = () => {
     return (
         <View style={styles.container}>
             {loading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
+                    <View style={styles.centered}>
+                        <ActivityIndicator size="large" color="#0000ff" />
+                        <Text>Recherche des données...</Text>
+                    </View>
             ) : errorMessage ? (
                 <Text style={styles.errorText}>{errorMessage}</Text>
             ) : (
-                <FlatList
-                    data={facts}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.key}
-                    onEndReached={fetchMoreFacts}
-                    onEndReachedThreshold={0.5}
-                    ListFooterComponent={renderFooter}
-                    onRefresh={fetchMultipleFacts}
-                    refreshing={refreshing}
-                    inverted={true}
-                />
+                    <FlatList
+                        data={facts.slice(0, 6)}
+                        renderItem={renderItem}
+                        keyExtractor={item => item.key}
+                        showsHorizontalScrollIndicator={false}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={renderFooter}
+                        onRefresh={fetchMultipleFacts}
+                        refreshing={refreshing}
+                    />
             )}
         </View>
     );
@@ -104,6 +86,8 @@ const FactListScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
         paddingTop : '20%',
         padding: 20,
         backgroundColor: '#f0f0f0',
@@ -112,15 +96,40 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom : 5,
     },
+    containerFact: {
+        flex: 1,
+        backgroundColor: '#f0f0f0',
+        borderRadius : 10,
+        width: '100%',
+        marginBottom : 5,
+        borderWidth: 1,
+        borderColor: '#fd0000',
+        marginHorizontal: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    Error: {
+        flex: 1,
+        backgroundColor: '#f0f0f0',
+        borderRadius : 10,
+        width: '100%',
+        marginBottom : 5,
+        borderWidth: 1,
+        borderColor: '#fd0000',
+        marginHorizontal: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     factText: {
         fontSize: 16,
         fontStyle: 'italic',
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
+        marginHorizontal : 10,
+        margin : 25,
+        borderBottomWidth : 1,
+        borderColor: '#fff',
     },
     errorText: {
-        color: 'red',
+        color: '#FD7F00FF',
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center',
@@ -131,6 +140,11 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         borderTopWidth: 1,
         borderColor: '#ccc',
+    },
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

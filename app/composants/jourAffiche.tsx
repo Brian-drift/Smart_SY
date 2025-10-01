@@ -16,11 +16,12 @@ function JoursAffiche() {
 
     return (
         <Text style={[{
+            top : 0,
             fontWeight : 700,
-            fontSize : 60,
+            fontSize : 40,
         },]}>
             {dayName.substring(0, dayName.length - 1)}
-            <Text style={[{ fontSize : 70}, dotStyle]}>{ dayName.slice( -1 )}</Text>
+            <Text style={[{ fontSize : 50}, dotStyle]}>{ dayName.slice( -1 )}</Text>
         </Text>
     );
 }

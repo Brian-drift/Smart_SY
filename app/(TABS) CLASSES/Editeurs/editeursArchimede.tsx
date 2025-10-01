@@ -5,37 +5,15 @@ import {
     View,
     FlatList,
     SafeAreaView,
-    Button,
-    useWindowDimensions, ActivityIndicator
+    ActivityIndicator
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useNavigation, useFocusEffect, useRoute} from "@react-navigation/native";
+import {useFocusEffect} from "@react-navigation/native";
 import ArchimedeItems from "@/app/composants/archimedeItems";
-import LottieView from "lottie-react-native";
 import {fetchClassesArc} from "@/app/composants/listeDesClassesArchimede";
 
 function EditeursArchimede() {
-    const {width} = useWindowDimensions();
     const [classes, setClasses] = useState([]);
-    const [nom, setNom] = useState('');
     const [isLoading, setIsLoading] = useState(true); // Ajout de l'état de chargement
-
-    const navigation =  useNavigation();
-
-    const loadProfile = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('profil_data');
-            if (jsonValue != null) {
-                const donnees = JSON.parse(jsonValue);
-                setNom(donnees.nom);
-            }
-        } catch (e) {
-            console.error('Erreur lors du chargement :', e);
-        } finally {
-            // Dans tous les cas (succès ou échec), on arrête le chargement
-            setIsLoading(true);
-        }
-    };
 
 
     useFocusEffect(
@@ -50,12 +28,6 @@ function EditeursArchimede() {
                 .finally(() => {
                     setIsLoading(false);
                 })
-            // Lancer la fonction de chargement des données
-            loadProfile();
-            // Ici, on peut retourner une fonction de "nettoyage"
-            return () => {
-                // Optionnel : ce code s'exécute quand on quitte l'écran
-            };
         }, [])
     );
 

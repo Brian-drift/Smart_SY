@@ -63,11 +63,6 @@ const styles = StyleSheet.create({
         // Ombre pour Android
         elevation: 10,
     },
-    image: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 8,
-    },
     text: {
         textAlign: 'left',
         fontSize: 24,
