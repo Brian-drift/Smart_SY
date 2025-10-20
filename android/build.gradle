@@ -5,6 +5,13 @@ buildscript {
     google()
     mavenCentral()
   }
+  defaultConfig {
+          // ...
+          minSdkVersion = 21 // Minimum API supporté par Notifee
+          targetSdkVersion = 33 // 👈 Assurez-vous que c'est 33 ou plus
+          compileSdkVersion = 33 // 👈 Assurez-vous que c'est 33 ou plus
+          // ...
+      }
   dependencies {
     classpath('com.android.tools.build:gradle')
     classpath('com.facebook.react:react-native-gradle-plugin')

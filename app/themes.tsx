@@ -1,12 +1,26 @@
-// theme.js
-export const lightTheme = {
-    background: "#FFF",
-    text: "#000",
-    mainColor: "#1a9cd7",
+export type ThemeColors = {
+    background: string;
+    text: string;
+    primary: string;
+    secondary: string;
 };
 
-export const darkTheme = {
-    background: "#000",
-    text: "#FFF",
-    mainColor: "#07B7DC",
-};
+//------Thème Clair --------
+export const LightColors: ThemeColors = {
+    background : '#ffffff',
+    text: '#000000',
+    primary: '#4b4b4b',
+    secondary: '#dedede',
+}
+//------Thème Clair --------
+export const DarkColors: ThemeColors = {
+    background : '#3f3f3f',
+    text: '#d9d9d9',
+    primary: '#757575',
+    secondary: '#bebebe',
+}
+
+export const getThemeColors =
+    (scheme: 'light' | 'dark' | undefined): ThemeColors => {
+        return scheme === 'dark' ? DarkColors : LightColors;
+    };

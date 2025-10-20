@@ -1,0 +1,113 @@
+import React, { useState, useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  StyleSheet,
+  Dimensions,
+  TouchableWithoutFeedback,
+} from "react-native";
+
+const { height } = Dimensions.get("window");
+
+export default function CustomBottomSheet() {
+  const [visible, setVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(height)).current;
+
+  const openSheet = () => {
+    setVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeSheet = () => {
+    Animated.timing(slideAnim, {
+      toValue: height,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setVisible(false));
+  };
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.button} onPress={openSheet}>
+        <Text style={styles.buttonText}>Ouvrir le Bottom Sheet</Text>
+      </TouchableOpacity>
+
+      {visible && (
+        <TouchableWithoutFeedback onPress={closeSheet}>
+          <View style={styles.overlay}>
+            <Animated.View
+              style={[
+                styles.sheetContainer,
+                { transform: [{ translateY: slideAnim }] },
+              ]}
+            >
+              <View style={styles.sheetHeader}>
+                <Text style={styles.title}>Mon Bottom Sheet 🎉</Text>
+                <TouchableOpacity onPress={closeSheet}>
+                  <Text style={styles.close}>Fermer</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.content}>
+                Tu peux mettre ici du contenu, des boutons, des infos, etc.
+              </Text>
+            </Animated.View>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    backgroundColor: "#007bff",
+    padding: 15,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  sheetContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    minHeight: height * 0.3,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  close: {
+    color: "red",
+  },
+  content: {
+    marginTop: 15,
+    fontSize: 16,
+    color: "#333",
+  },
+});

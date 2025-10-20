@@ -4,7 +4,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     Text,
-    Dimensions, useWindowDimensions, Button, TouchableNativeFeedback
+    Dimensions, useWindowDimensions, TouchableNativeFeedback
 } from "react-native";
 import {MotiView} from "moti";
 import {useNavigation,useFocusEffect } from "@react-navigation/native";
