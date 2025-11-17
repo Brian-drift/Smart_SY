@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text} from "react-native";
+import {Text, View} from "react-native";
 
 function DateAffiche() {
     const [day, setDay] = useState(new Date().getDate());
@@ -9,11 +9,13 @@ function DateAffiche() {
     }, [])
 
     return (
-        <Text style={[{
-            top : 12,
-            fontWeight : 700,
-            fontSize : 38,
-        }]}> {day} </Text>
+        <View>
+            <Text style={[{
+                fontWeight : 700,
+                fontSize : 28,
+                color :  'rgba(3,3,3,0.31)',
+            }]}> {day}</Text>
+        </View>
     );
 }
 

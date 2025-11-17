@@ -9,18 +9,16 @@ function MoisAffiche() {
 
     useEffect(() => {
         const date = new Date();
-        const name : string = date.toLocaleDateString("fr-FR", {month : "long"});
+        const name : string = date.toLocaleDateString("fr-FR", {month : "short"});
         setMonthName(name);
     }, [])
 
     return (
         <Text style={[{
-            marginHorizontal : 10,
-            top : 22,
-            fontWeight : 700,
-            fontSize : 30,
+            fontWeight : 400,
+            fontSize : 28,
         }, textStyle]}>
-            {monthName}
+            /{monthName}
         </Text>
     );
 }

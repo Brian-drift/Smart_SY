@@ -28,6 +28,8 @@ import messageries from "@/app/Paramètre/messageries";
 import Notifications from "@/app/Paramètre/notifications";
 import Apropos from "@/app/Paramètre/apropos";
 import faq from "@/app/Paramètre/faq";
+import Calendars from "@/app/composants/callandrier/callendar";
+import AppCalendar from "@/app/composants/callandrier/callendar";
 
 // Composant pour l'écran de choix de rôle
 const ChoixRoleScreen = ({ navigation }) => {
@@ -110,6 +112,7 @@ export default function Index() {
                 <Stack.Screen name={"choixDesClasses"} component={ChoixDesClasses}/>
 
                 <Stack.Screen name={"EleveDashboard"} component={EcransDaccuilleEleves}/>
+                <Stack.Screen name={"Calendars"} component={AppCalendar}/>
                 <Stack.Screen name={"Classes"} component={Classe}/>
                 <Stack.Screen name={"pdfScreen"} component={PdfScreen}/>
 

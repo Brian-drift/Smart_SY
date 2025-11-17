@@ -13,10 +13,6 @@ export default function Parametre () {
 
     // L'état des données affichées (ce qui est sauvegardé)
     const [nomAffiche, setNomAffiche] = useState('')
-    const [classeAffiche, setClasseAffiche] = useState('')
-
-    const [isDark, setIsDark] = useState(false);
-
 
     const handleReset = async () => {
         try {
@@ -36,7 +32,6 @@ export default function Parametre () {
                 const donnees = JSON.parse(jsonValue);
                 // On met à jour l'état d'affichage avec les données chargées
                 setNomAffiche(donnees.nom);
-                setClasseAffiche(donnees.classe);
                 // On met aussi à jour l'état du formulaire pour que les champs soient pré-remplis
                 setNom(donnees.nom);
                 setClasse(donnees.classe);
@@ -55,7 +50,8 @@ export default function Parametre () {
         <View style={[styles.container]}>
             <Text style={styles.title}>Paramètres</Text>
 
-            <TouchableOpacity style={[styles.savedDataContainer]} onPress={() => navigation.navigate("profils")}>
+        <View style={styles.view}>
+            <TouchableOpacity style={[styles.restartButton]} onPress={() => navigation.navigate("profils")}>
                 <Ionicons name={"person-outline"} size={20} color="#5e5e5e" />
                 <Text style={[styles.text1]}>{nomAffiche}</Text>
                 <View style={[styles.chevron, {position: "absolute", right : "1%", top : 5}]}>
@@ -71,6 +67,11 @@ export default function Parametre () {
                     <Ionicons name={"book"} size={20} color="#5e5e5e" />
                 </View>
             </TouchableOpacity>
+        </View>
+
+            ====
+
+        <View  style={styles.view}>
             <TouchableOpacity style={styles.restartButton} onPress={() => navigation.navigate("messagerie")}>
                 <Ionicons name={"chatbubbles-outline"} size={23} color="#5e5e5e" />
                 <Text style={styles.text2}>
@@ -92,12 +93,15 @@ export default function Parametre () {
             <TouchableOpacity style={styles.restartButton} onPress={() => navigation.navigate("Personalisation")}>
                 <Ionicons name={"shirt-outline"} size={23} color="#5e5e5e" />
                 <Text style={styles.text2}>
-                    Personalisation
+                    Themes
                 </Text>
                 <View style={[styles.chevron, {position: "absolute", right : "1%", top : 5}]}>
                     <Ionicons name={"chevron-forward"} size={20} color="#5e5e5e" />
                 </View>
             </TouchableOpacity>
+        </View>
+
+        <View style={styles.view}>
             <TouchableOpacity style={styles.restartButton} onPress={() => handleReset()}>
                 <Ionicons name={"reload"} size={20} color="#5e5e5e" />
                 <Text style={styles.text2}>
@@ -125,6 +129,7 @@ export default function Parametre () {
                     <Ionicons name={"chevron-forward"} size={20} color="#5e5e5e" />
                 </View>
             </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -140,7 +145,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         borderBottomWidth : 1,
-        borderColor : "rgba(0,0,0,0.26)",
+        borderColor: 'rgba(148,148,148,0.86)',
+        marginBottom : '4%'
     },
     label: {
         fontSize: 16,
@@ -153,15 +159,6 @@ const styles = StyleSheet.create({
     },chevron: {
         padding: 10,
         borderRadius: 5,
-    },
-    savedDataContainer: {
-        flexDirection : "row",
-        marginTop: 30,
-        marginBottom: 30,
-        padding: 15,
-        borderWidth: 1,
-        borderColor: 'rgba(68,68,68,0.36)',
-        borderRadius: 8,
     },
     text1: {
         marginHorizontal : 20,
@@ -177,10 +174,17 @@ const styles = StyleSheet.create({
     },
     restartButton : {
         flexDirection : "row",
-        marginBottom: 30,
+        margin : 10,
+        padding: 15,
+        borderBottomWidth: 1,
+        borderColor: 'rgba(148,148,148,0.38)',
+        borderRadius: 8,
+    },
+    view : {
+        marginBottom: 15,
         padding: 15,
         borderWidth: 1,
-        borderColor: 'rgba(100,100,100,0.38)',
+        borderColor: 'rgba(100,100,100,0.8)',
         borderRadius: 8,
     },
 
