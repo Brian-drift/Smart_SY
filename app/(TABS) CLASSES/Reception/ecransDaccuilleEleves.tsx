@@ -8,7 +8,10 @@ import {
     Dimensions,
     TouchableWithoutFeedback,
     TouchableNativeFeedback,
-    ActivityIndicator, Modal, TextInput,
+    ActivityIndicator,
+    Modal,
+    TextInput,
+    Button, Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
@@ -19,8 +22,12 @@ import DateAffiche from "@/app/composants/dateAffiche";
 import MoisAffiche from "@/app/composants/moisAffiche";
 import JoursAffiche from "@/app/composants/jourAffiche";
 import {saveActivityForToday} from "@/app/composants/saveActivityForToday";
+import CheckedOrNot from "@/app/composants/checkedOrNot";
+import {clearAllActivities} from "@/app/composants/stockage/suppression";
 
 const { height } = Dimensions.get("window");
+
+
 
 export default function EcransDaccuilleEleves() {
 
@@ -34,23 +41,45 @@ export default function EcransDaccuilleEleves() {
     const [titre , setTitre] = useState('');
     const [description, setDescription] = useState('');
     const [categorie, setCategorie] = useState('');
+    const [objectif, setObjectif] = useState(null);
+
+    function getDaysInMonth() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    }
 
     const navigation = useNavigation();
 
     function handleAdd() {
 
-        if (!titre || !description || !categorie) {
-            console.log("Les champs ne sont pas remplis.");
-            return;
+        const habits = {};
+        for (let i = 1; i <= objectif; i++) {
+            habits[i] = false; // toutes les cases sont décochées au départ
         }
 
-        const activity = {
+        const newActivity = {
             titre,
             description,
             categorie,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            objectif, // 14 / 21 / mois
+            habits
         };
-        saveActivityForToday(activity);
+
+// remplacer ton saveActivity existant par :
+        saveActivityForToday(newActivity);
+
+
+        if (!titre || !description || !categorie) {
+            alert("Les champs ne sont pas remplis.");
+            return;
+        }
+
+        Animated.timing(slideAnim, {
+            toValue: height,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setOpen(false));
     }
 
 
@@ -86,6 +115,11 @@ export default function EcransDaccuilleEleves() {
             duration: 300,
             useNativeDriver: true,
         }).start(() => setOpen(false));
+
+        return (
+          <Text> Salut </Text>
+        );
+
     };
 
 
@@ -137,7 +171,6 @@ export default function EcransDaccuilleEleves() {
                     </Text>
                 </MotiView>
 
-
             </TouchableNativeFeedback>
             <View style={styles.contente}>
                 <TouchableOpacity onPress={openActionSheet} style={styles.plusButton}>
@@ -151,11 +184,24 @@ export default function EcransDaccuilleEleves() {
                 </TouchableOpacity>
             </View>
 
+            <Button title={"Delete"}
+            onPress={() => {
+            Alert.alert(
+                "Confirmer la suppression",
+                "Êtes-vous sûr de vouloir supprimer toutes les activités et objectifs ?",
+                [
+                    { text: "Annuler", style: "cancel" },
+                    { text: "Supprimer", style: "destructive", onPress: async () => {
+                            await clearAllActivities();
+                            saveActivityForToday([]);
+                        } }
+                ]
+            );
+        }} />
 
 
 
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             {visible && (
                 <TouchableWithoutFeedback onPress={closeSheet}>
                     <View style={styles.overlay}>
@@ -242,22 +288,29 @@ export default function EcransDaccuilleEleves() {
                                     onChangeText={setCategorie}
                                 />
                                 <Text style={styles.sectionTitle}>Quand est tu prét à t'y mettre pour cette objectif ?</Text>
-                                <View style={styles.triggerRow}>
-                                    {["free", "time", "action"].map(type => (
-                                        <TouchableOpacity
-                                            key={type}
-                                            style={[
-                                                styles.triggerButton,
-                                            ]}
-                                        >
-                                            <Text style={styles.triggerText}>
-                                                {type === "free" && "Libre"}
-                                                {type === "time" && "Heure"}
-                                                {type === "action" && "Après une action"}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 10 }}>
+                                    <TouchableOpacity
+                                        onPress={() => setObjectif(14)}
+                                        style={{ padding: 10, backgroundColor: objectif === 14 ? "#333" : "#CCC", borderRadius: 8 }}
+                                    >
+                                        <Text style={{ color: objectif === 14 ? "white" : "black" }}>14 jours</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        onPress={() => setObjectif(21)}
+                                        style={{ padding: 10, backgroundColor: objectif === 21 ? "#333" : "#CCC", borderRadius: 8 }}
+                                    >
+                                        <Text style={{ color: objectif === 21 ? "white" : "black" }}>21 jours</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        onPress={() => setObjectif(getDaysInMonth())} // fonction qui calcule le nombre de jours du mois en cours
+                                        style={{ padding: 10, backgroundColor: objectif === getDaysInMonth() ? "#333" : "#CCC", borderRadius: 8 }}
+                                    >
+                                        <Text style={{ color: objectif === getDaysInMonth() ? "white" : "black" }}>Mois</Text>
+                                    </TouchableOpacity>
                                 </View>
+
                                 <View style={styles.buttonRow}>
                                     <TouchableOpacity style={styles.cancelBtn} onPress={closeActionSheet}>
                                         <Text style={styles.cancelText}>Annuler</Text>

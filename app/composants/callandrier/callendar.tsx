@@ -7,11 +7,11 @@ import {
     Dimensions,
     Animated,
     TouchableWithoutFeedback,
-    TouchableOpacity, Alert, FlatList
+    TouchableOpacity, FlatList, Button
 } from 'react-native';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import {registerAndGetPresenceDates} from "@/app/composants/storage";
-import {FontAwesome, Ionicons} from "@expo/vector-icons";
+import {FontAwesome} from "@expo/vector-icons";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import moment from "moment"; // Assurez-vous que le chemin est correct
 import "moment/locale/fr"
@@ -61,12 +61,75 @@ const AppCalendar = () => {
 
     const [activities, setActivities] = useState([]);
 
+
     async function loadActivitiesForDate(date) {
         const stored = await AsyncStorage.getItem("activities");
         const all = stored ? JSON.parse(stored) : {};
 
-        setActivities(all[date] || []); // Plusieurs activités = un tableau
+        const loaded = all[date] || [];
+
+        // 🔹 Assurer que habits existe pour chaque activité
+        const safeActivities = loaded.map(act => ({
+            ...act,
+            habits: act.habits || (() => {
+                const obj = {};
+                for (let i = 1; i <= act.objectif; i++) obj[i] = false;
+                return obj;
+            })()
+        }));
+
+        setActivities(safeActivities);
     }
+
+
+    function getCurrentHabitDay(createdAt) {
+        const start = new Date(createdAt);
+        const today = new Date();
+
+        // enlever l’heure pour éviter les décalages
+        start.setHours(0,0,0,0);
+        today.setHours(0,0,0,0);
+
+        const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+
+        return diff + 1; // jour 1 = date de création
+    }
+
+
+    async function toggleDot(activityIndex, dayIndex) {
+        const updated = [...activities];
+        const act = updated[activityIndex];
+
+        const currentDay = getCurrentHabitDay(act.createdAt);
+
+        if (dayIndex != currentDay) {
+            alert("Tu ne peux cocher que la case du jour !");
+            return;
+        }
+
+        if (act.habits[dayIndex] === true) {
+            alert("La case du jour est déjà cochée.");
+            return;
+        }
+
+        // Cocher la case
+        act.habits[dayIndex] = true;
+
+        setActivities(updated);
+
+        // 🔥 Fix : stocker dans la bonne DATE
+        const stored = await AsyncStorage.getItem("activities");
+        const all = stored ? JSON.parse(stored) : {};
+
+        const activityDate = act.createdAt.split("T")[0];
+        all[activityDate] = updated;
+
+        await AsyncStorage.setItem("activities", JSON.stringify(all));
+    }
+
+
+
+
 
     const openSheet = (day) => {
         setVisible(true);
@@ -221,16 +284,47 @@ const AppCalendar = () => {
                                             data={activities.filter(item => item && item.titre)} // On garde que les vraies activités
                                             keyExtractor={(item, index) => index.toString()}   // clé unique
                                             renderItem={({ item }) => (
-                                                <View style={{ paddingVertical: 5 }}>
-                                                    <Text style={{ fontSize: 16 }}> • {item.titre} – {item.description}</Text>
+                                                <View style={{ borderColor : '#e1e1e1', borderWidth : 1, borderRadius : 10 }}>
+                                                    {activities.map((act, indexAct) => (
+                                                        <View key={indexAct} >
+                                                            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                                                                {act.titre}
+                                                            </Text>
+
+                                                            <View
+                                                                style={{
+                                                                    flexDirection: "row",
+                                                                    flexWrap: "wrap",
+                                                                    width: "100%",
+                                                                }}
+                                                            >
+                                                                {Object.keys(act.habits).map((day, indexDay) => (
+                                                                    <TouchableOpacity
+                                                                        key={indexDay}
+                                                                        onPress={() => toggleDot(indexAct, day)}
+                                                                        style={{
+                                                                            width: "14.28%", // 7 colonnes
+                                                                            justifyContent: "center",
+                                                                            alignItems: "center",
+                                                                            paddingVertical: 6
+                                                                        }}
+                                                                    >
+                                                                        <Text style={{ fontSize: 22 }}>
+                                                                            {act.habits[day] ? "●" : "○"}
+                                                                        </Text>
+                                                                    </TouchableOpacity>
+                                                                ))}
+                                                            </View>
+                                                        </View>
+                                                    ))}
                                                 </View>
                                             )}
                                             ListEmptyComponent={() => (
                                                 <Text style={{ fontStyle: "italic" }}>Aucune activité pour cette date.</Text>
                                             )}
                                         />
-                                    )}
 
+                                    )}
 
                                 </Animated.View>
                             </View>
@@ -277,47 +371,23 @@ const AppCalendar = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    container2: {
-        paddingTop : "30%",
-        justifyContent: 'center',
-    },
-    container3: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom : 50,
-        paddingHorizontal : 10
-    },
-    header: {
-        position: 'absolute',
-        top : 0,
-        fontSize: 22,
-        textAlign: 'center',
-        left : 10,
-        fontWeight: '600',
-    },
-    loading: {
-        flex: 1,
-        justifyContent: 'center',
-    },
+    container: {flex: 1, justifyContent: 'center',},
+    container2: {paddingTop : "30%", justifyContent: 'center',},
+    container3: {flexDirection: 'row', justifyContent: 'space-between', marginBottom : 50, paddingHorizontal : 10},
+    header: {position: 'absolute', top : 0, fontSize: 22, textAlign: 'center', left : 10, fontWeight: '600',},
+    loading: {flex: 1, justifyContent: 'center',},
     note: {
         textAlign: 'center',
         marginTop: 20,
         color: '#888',
         paddingHorizontal: 20,
     },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        justifyContent: "flex-start",
-
-        zIndex: 10,
-    },
+    overlay: {...StyleSheet.absoluteFillObject, justifyContent: "flex-start", zIndex: 10,},
     sheetContainer: {
+        paddingHorizontal : 10,
         backgroundColor: "#fff",
         borderRadius : 15,
+        maxHeight : height * 0.3035,
         minHeight : height * 0.3035,
         width : "50%",
         alignSelf : "flex-end",
@@ -333,9 +403,10 @@ const styles = StyleSheet.create({
     },
     dateSheetContainer: {
         fontSize : 12,
-        fontWeight : 500,
+        fontWeight : 700,
         fontFamily : 'system',
         marginTop : 2,
+        color : '#000000'
     },
     viewSheetContainer : {
         alignItems: 'center',
